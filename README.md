@@ -13,9 +13,11 @@ SO Windows
 ``
 flex.exe ctoy.lex
 ``
+
 ``
 gcc ctoy.c -o ctoy
 ``
+
 ``
 ctoy.exe            
 ``
