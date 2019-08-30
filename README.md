@@ -9,6 +9,7 @@ Projeto para desenvolvimento de uma aplicação de análise léxica para a disci
 ## Como executar
 
 SO Windows
+
 ``
 flex.exe ctoy.lex 
 
