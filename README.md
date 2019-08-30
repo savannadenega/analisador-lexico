@@ -11,8 +11,8 @@ Projeto para desenvolvimento de uma aplicação de análise léxica para a disci
 SO Windows
 
 ``
-flex.exe ctoy.lex  
-gcc ctoy.c -o ctoy  
-ctoy.exe  
+flex.exe ctoy.lex    
+gcc ctoy.c -o ctoy    
+ctoy.exe    
 ``
 
