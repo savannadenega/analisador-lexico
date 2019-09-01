@@ -1,0 +1,2 @@
+A data de hoje é <date> .
+A date é <date>.
