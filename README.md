@@ -18,7 +18,7 @@ flex.exe ctoy.lex
 ``
 
 ``
-gcc ctoy.c -o ctoy
+gcc ctoy.c (ou lex.yy.c) -o ctoy
 ``
 
 ``
