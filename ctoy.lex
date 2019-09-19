@@ -10,63 +10,79 @@
 int numlines = 0;
 int numOperators = 1;
 
+
 %}
 
 
 DIGIT [0-9]*
-ID [a-z][a-z0-9]*
+ID [A-Za-z][A-Za-z0-9]*
+STRING   \"([^\\\"]|\\.)*\"
+COMMENT  \|\|.*\n
+WHITE_ESPACE  [\n|\s|\t\r]
+
+
+
 
 
 %%
-/* ------------- regras ------------- */
 
-/* contagem de linhas */
-\n	{ printf(\nnumlines\n); } numlines++;
 
-int|if { printf("[reserved_word, int] "); } /* ------------- descobrir como pegar a palavra reservada e imprimir ------------- */
-
-{ID} { printf("​[id, %d]​ ", numOperators); } numOperators++;
-
-= { printf("​[E​qual_Op, =​] "); }
-
-!= { printf("​[Relational_Op, !=] "); }
-
-+ { printf("​[​Arith_​Op, +] "); }
-
-{DIGIT} { printf("​[num, 52] "); } /* ------------- descobrir como pegar numero e imprimir ------------- */
-
-{DIGIT}*"."{DIGIT}* { printf("​[num, 52] "); } /* ------------- descobrir como pegar numero e imprimir ------------- */
+int|if|void|for|return|else|string|NULL|scanf|printf { printf("[reserved_word, %s]\n", yytext); } 
 
 
 
+{ID} { printf("​[id, %s]\n", yytext); } numOperators++;
 
-/* ------------- CONTINUAR A PARTIR DE: Remoção de espaços em branco e comentários: no trabalho ------------- */
+"=" { printf("​[E​qual_Op, %s]\n ", yytext); }
+
+"!="|"<"|"<="|"=="|">="|">" { printf("​[relational_Op, %s]\n ", yytext); }
+
+"||"|"&&" { printf("​[Logical_Op, %s]\n ", yytext); }
+
+"+"|"-"|"*"|"/" { printf("​[​Arith_​Op, %s]\n ", yytext); }
+
+"(" { printf("​[l_​paren, %s\n ", yytext); }
+
+")" { printf("​[​r_paren, %s]\n ", yytext); }
+
+"{" { printf("​[l_bracket, %s]\n ", yytext); }
+
+"}" { printf("​[r_bracket, %s]\n ", yytext); }
+
+"," { printf("​[comma, %s]\n ", yytext); }
+
+";" { printf("​[semicolon, %s]\n ", yytext); }
+
+"[" { printf("​[r_esquare_bracket, %s]\n ", yytext); }
+
+"]" { printf("​[r_square_bracket, %s]\n ", yytext); }
+
+"#" { printf("​[number_sign, %s]\n ", yytext); }
+
+":" { printf("​[colon, %s]\n ", yytext); }
+
+"%" { printf("​[remainder, %s]\n ", yytext); }
 
 
-/*
+{STRING} {printf("​[String, %s]\n ", yytext); }
 
-{DIGIT}+ { printf("Numero inteiro encontrado: %s (%d)\n", yytext, atoi(yytext));}
+{DIGIT} { printf("​[num, %s (%d)]\n ", yytext,atoi(yytext)); } 
 
-{DIGIT}"."{DIGIT}* {printf("Numero float encontrado: %s (%f)\n", yytext, atof(yytext));}
 
-if|then|begin|procedure|function	{
-		printf("Palavra reservada encontrada: %s\n ", yytext);}
+{WHITE_ESPACE} {}
 
-{ID}	{printf("Identificador encontrado: %s\n", yytext);}
+{COMMENT} {}
 
-"+"|"-"|"*"|"/" {printf("Operador encontrado: %s\n", yytext);}
+{DIGIT}*"."{DIGIT}* { printf("​[num, %s (%f)]\n ",yytext, atof(yytext)); } 
 
-"{"[\^{}}\n]*"}"
+"{"[\^{}}\n]*"}"	
 
 [ \t\n]+
 
 .	printf("Caractere nao reconhecido: %s\n", yytext);
 
-*/
-
 
 %%
-/* ------------- código de usuário ------------- */
 
 int main(int argc, char *argv[]){
 	yyin = fopen(argv[1], "r");
@@ -74,3 +90,6 @@ int main(int argc, char *argv[]){
 	fclose(yyin);
 	return 0;
 }
+
+
+
