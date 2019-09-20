@@ -1,4 +1,4 @@
-# analisador-lexico
+﻿# analisador-lexico
 
 Projeto para desenvolvimento de uma aplicação de análise léxica para a disciplina de Tradutores Unisinos-2019.
 
@@ -10,6 +10,7 @@ Projeto para desenvolvimento de uma aplicação de análise léxica para a disci
 
 ### Como executar
 
+- Primeiro instalar o [Flex](https://codedost.com/flex/)
 
 SO Windows
 

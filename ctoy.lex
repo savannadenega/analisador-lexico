@@ -10,76 +10,419 @@
 int numlines = 0;
 int numOperators = 1;
 
-
 %}
 
+/*
+- include de biblioteca
+- declaracao de metodo (com ou sem parametro)
+- declaracao variavel (tipos: float)
+- declaracao variavel com ponteiro
+- atribuicao de variavel
+- uso de variavel (com ponteiro e parenteses ou nao)
+- array de variavel
+- operadores aritmeticos (variavel ++)
+- chamada de metodo (com ou sem parametro)
+- declaracao operador condicional (if{})
+- declaracao operador iteracao (for)
+- retorno
+- comentarios
+- declaracao de array
+*/
 
-DIGIT [0-9]*
-ID [A-Za-z][A-Za-z0-9]*
-STRING   \"([^\\\"]|\\.)*\"
-COMMENT  \|\|.*\n
-WHITE_ESPACE  [\n|\s|\t\r]
+
+/*  ____  _        _            
+   / ___|| |_ __ _| |_ ___  ___ 
+   \___ \| __/ _` | __/ _ \/ __|
+    ___) | || (_| | ||  __/\__ \
+   |____/ \__\__,_|\__\___||___/ */
+                             
 
 
+/* state "in a C comment" */
 
+%x comment   
 
+/* State "in a C function".  Because the only thing the "function"
+   state does is skips strings and comments, and counts "{" and "}",
+   and then exits when there have been enough }'s, the "function"
+   state can also be used for such things as "inside a struct
+   definition" and "inside an initialiser". */
+
+%x function  
+
+/* State "in a C function's argument list". */
+
+%x arguments 
+
+/* State "parsing a pointer to a function". */
+
+%x func_ptr
+
+/* State "parsing arguments to a pointer to a function". */
+
+%x func_ptr_arg
+
+/* state "parsing a print format instruction" */
+
+%x print_format
+
+/* State "in a C string".  Although Cfunctions is not interested in
+   strings, this state is necessary in order to jump over any curly
+   braces in strings that might confuse the curly braces depth
+   counter, and to prevent clashes with comment-like objects in
+   strings. */
+
+%x c_string
+
+/* State "in a C preprocessor statement".  This includes multiline
+   statements which are matched with an appropriate regular
+   expression. */
+
+%x in_cpp
+
+/* State "in a struct definition".  For example `a' in 
+   `struct a { int x, int y };'. */
+
+%x in_struct
+
+/* State "in an initialiser".  For example `10' in `int x = 10;'. */
+
+%x initialiser
+
+/* State "in an enum definition".  For example `b' in 
+   `enum b { y, z };'. */
+
+%x in_enum
+
+/* State "is an enum",  For example `c' in `enum x { c };'. */
+
+%x is_enum
+
+/* State in "traditional C variable declarations".  For example 
+   `int x' in `char * func (x) int x {'. */
+
+%x traditional
+
+/* Macros for C preprocessor. */
+
+endline       \r?\n
+
+/* The `\\{endline}' is to deal with multiline cpp statements. */
+
+cpp_space     ([ \t\f\r]|\\{endline})+
+cpp_opt_space ([ \t\f\r]|\\{endline})*
+
+cpp_any       (.|\\{endline})
+cpp           ^{cpp_opt_space}#{cpp_opt_space}
+
+/*   ____                                      
+    / ___|  _ __ ___   __ _  ___ _ __ ___  ___ 
+   | |     | '_ ` _ \ / _` |/ __| '__/ _ \/ __|
+   | |___  | | | | | | (_| | (__| | | (_) \__ \
+    \____| |_| |_| |_|\__,_|\___|_|  \___/|___/ */
+                                            
+
+/* The macro c_space has been set to match only a single `\n' in order
+   to prevent collisions with {cpp}.  I don't know if there is
+   anywhere in the rules that expects {c_space} to match more than one
+   `\n' - this might be a problem. */
+
+c_space       ([ \t\f\r]+|\n)
+c_opt_space   [ \t\f\r\n]*
+c_word        [A-Za-z_][A-Za-z_0-9]*
+c_array       \[[^\][]*\]
+c_var         (\*{c_opt_space})*{c_word}({c_opt_space}{c_array})*
+c_var_no_pointer         {c_word}({c_opt_space}{c_array})*
+c_func_ptr    \({c_opt_space}\**{c_opt_space}{c_word}{c_opt_space}\)
+braces \{[^{}]*\}
+line_directive line{cpp_opt_space}[0-9]+{cpp_opt_space}\"([^\"]|\\\")+\"
 
 %%
 
+  /* C preprocessor conditional statements. */
 
-int|if|void|for|return|else|string|NULL|scanf|printf { printf("[reserved_word, %s]\n", yytext); } 
+<*>{cpp}if{cpp_any}*$              cpp_add (cfp, yytext, CPP_IF);
 
+<*>{cpp}else{cpp_any}*$            cpp_add (cfp, yytext, CPP_ELSE);
 
+<*>{cpp}elif{cpp_any}*$            cpp_add (cfp, yytext, CPP_ELIF);
 
-{ID} { printf("​[id, %s]\n", yytext); } numOperators++;
+<*>{cpp}endif{cpp_any}*$           cpp_add (cfp, yytext, CPP_ENDIF);
 
-"=" { printf("​[E​qual_Op, %s]\n ", yytext); }
+  /* Other C preprocessor statements. */
 
-"!="|"<"|"<="|"=="|">="|">" { printf("​[relational_Op, %s]\n ", yytext); }
+<*>{cpp}define{cpp_space}{c_word} { do_define (ARGS); }
 
-"||"|"&&" { printf("​[Logical_Op, %s]\n ", yytext); }
+<*>{cpp}{line_directive}   line_change (ARGS);
 
-"+"|"-"|"*"|"/" { printf("​[​Arith_​Op, %s]\n ", yytext); }
+{cpp}             do_start_cpp (ARGS);
 
-"(" { printf("​[l_​paren, %s\n ", yytext); }
+<in_cpp>{cpp_any} inline_print (ARGS);
 
-")" { printf("​[​r_paren, %s]\n ", yytext); }
+<in_cpp>{endline} { inline_print (ARGS); parser_pop_state (); }
 
-"{" { printf("​[l_bracket, %s]\n ", yytext); }
+  /* Comments. */
 
-"}" { printf("​[r_bracket, %s]\n ", yytext); }
+<*>"/"(\\{endline})?"*"  {
+                  /* One important exception: "/ *" in strings is a
+                     part of a string, not a comment.  This only
+                     occurs for the case that the string is exactly
+                     "/ *". */
 
-"," { printf("​[comma, %s]\n ", yytext); }
+                    if (YY_START != c_string) {
+                      parser_push_state (comment);
+                    }
+                    else {
+                      /* Don't need a warning. */
+                      inline_print (ARGS);
+                    }               
+                  }
 
-";" { printf("​[semicolon, %s]\n ", yytext); }
+<comment>\*+\/    parser_pop_state ();
 
-"[" { printf("​[r_esquare_bracket, %s]\n ", yytext); }
+<comment>(([^\*]|\n)*|\*+([^/\*]|\n))  ;
 
-"]" { printf("​[r_square_bracket, %s]\n ", yytext); }
+<INITIAL,function>"/"(\\{endline})?"/".*  { 
+                    
+                      /* This could foul up on some cases.  For example,
+                       "a // * comment * /b" (a space was added between
+                       * and / here for obvious reasons).  */;
+                  }
 
-"#" { printf("​[number_sign, %s]\n ", yytext); }
+typedef(\{(\{(\{({braces}|[^}{])*\}|{braces}|[^}{])*\}|{braces}|[^}{])*\}|{braces}|[^}{;])*;   {
+                      do_copy_typedef (ARGS);
+                  }
 
-":" { printf("​[colon, %s]\n ", yytext); }
+  /* Type definitions. */
 
-"%" { printf("​[remainder, %s]\n ", yytext); }
+typedef           { do_typedef (ARGS); }
 
+  /* Enumerations. */
 
-{STRING} {printf("​[String, %s]\n ", yytext); }
+enum              { 
+                  parser_push_state (in_enum);
+                  function_save (ARGS);
+                  }
 
-{DIGIT} { printf("​[num, %s (%d)]\n ", yytext,atoi(yytext)); } 
+<in_enum>{c_word} { do_word (ARGS); }
 
+<in_enum>\{       {
+                  external_clear (cfp);
+                  BEGIN (is_enum);
+                  }
 
-{WHITE_ESPACE} {}
+<in_enum>{c_space} count_lines (ARGS);
 
-{COMMENT} {}
+<is_enum>{c_word}[^\},;]* { 
+                  inline_print (ARGS);
+                  }
 
-{DIGIT}*"."{DIGIT}* { printf("​[num, %s (%f)]\n ",yytext, atof(yytext)); } 
+<is_enum>(,|{c_space}) inline_print (ARGS);
 
-"{"[\^{}}\n]*"}"	
+<is_enum>\}       {
+                  inline_print (ARGS);
+                  parser_pop_state ();
+                  }
 
-[ \t\n]+
+<is_enum>;        line_error("`;' in enum list");
+                  
+  /* Structures and unions. */
 
-.	printf("Caractere nao reconhecido: %s\n", yytext);
+(struct|union)    { /* A `struct' is just the same 
+                                  syntactically as a `union'. */
+                  function_save (ARGS);
+                  parser_push_state (in_struct);
+                  }
+
+<in_struct>{c_word}  { do_word (ARGS); }
+
+<in_struct>\*     {
+                  function_save (ARGS);
+                  parser_pop_state (cfp);
+                  }
+
+<in_struct>;      {
+                  /* This state occurs in incomplete forward
+                     declaration of a struct. */
+                  forward_print (cfp, ";\n");
+                  BEGIN (INITIAL);
+                  }
+
+<in_struct>{c_space} ;
+
+<in_struct>\{      { 
+                   brace_open (cfp);
+                   external_clear (cfp);
+                   BEGIN (function);
+                   }
+
+  /* Initialisers (these begin with `=').  Cfunctions skips over
+     initialisers, because they don't need to be copied into header files. */
+
+<initialiser>;    {
+                    external_print (cfp, ";\n");
+                    parser_pop_state (cfp);
+                  }
+
+<initialiser>,    {
+                    current_arg = arg_share (current_arg);
+                    parser_pop_state (cfp);
+                  }
+
+<initialiser>\{   {
+                    brace_open (cfp);
+                    parser_push_state (function);
+                  }
+
+<initialiser>\([^\)]*\) {
+
+  /* This is to jump comma operators.  In practice it is very unlikely
+     that we ever see comma operators.  Comma operators are for using
+     side effects.  There can be no side effects in constant
+     expressions, which are the only expressions allowed outside
+     functions.  But that is the only place Cfunctions will ever
+     encounter them.  */
+                  }
+
+<initialiser>([^\"]|\n)  {
+                           /* Discard contents of initialiser. */
+			 }
+
+\({c_opt_space}{c_opt_space}\)        do_arguments (ARGS);
+\({c_opt_space}void{c_opt_space}\)    do_void_arguments (ARGS);
+
+  /* Function pointers.  At the moment this works for inline versions
+     of them but not for several other cases. */
+
+\({c_opt_space}\*{c_opt_space}     {
+                  inline_print (ARGS);
+                  parser_push_state (func_ptr);
+                  }
+
+<func_ptr>\){c_opt_space}\(        {
+                  inline_print (ARGS);
+                  BEGIN (func_ptr_arg);
+                  }
+
+<func_ptr>\)      {
+                  inline_print (ARGS);
+                  parser_pop_state ();
+                  }
+
+<func_ptr>{c_word}   do_function_pointer (ARGS);
+
+<func_ptr>[^\)]+     do_function_pointer (ARGS);
+
+<func_ptr_arg>\)   {
+                   do_function_pointer_argument (ARGS);
+                   parser_pop_state ();
+                   }
+
+<func_ptr_arg>\(   {
+                   do_function_pointer_argument (ARGS);
+                   parser_push_state (func_ptr_arg);
+                   }
+
+<func_ptr_arg>[^\(\)]+   {
+                   do_function_pointer_argument (ARGS);
+                   }
+
+  /* Beginning of a C argument. */
+
+\(                {
+                  do_start_arguments (cfp);
+                  BEGIN(arguments);
+                  }
+
+<arguments>\)     do_arguments_close_bracket (ARGS);
+
+<arguments>\(     do_arguments_open_bracket (ARGS);
+
+<arguments>({c_var}|\*+)      argument_save (ARGS);
+
+<arguments>,      argument_next (cfp);
+
+<arguments>{c_space}      ;
+
+<arguments>"..."  argument_save (ARGS);
+
+<arguments>([0-9]*|\"([^\"]|\\\")*\")   line_error ("unparseable macro");
+
+<INITIAL>\{       {
+		  start_function (cfp);
+		  }
+
+<INITIAL>__attribute__\(\(.*\)\)   {
+                  }
+
+\}                line_warning ("isolated }");
+
+<function>\{      {
+		  inline_print (ARGS);
+		  brace_open (cfp);
+		  }
+
+<function>\}      do_brace_close (cfp);
+
+<*>\"             start_quote (ARGS, YY_START);
+
+<c_string>(\\[^\"])*            inline_print (ARGS);
+
+<c_string>(\\.|[^\\"])*         inline_print (ARGS);
+
+<function>([^\}\{\"]|\n|\'\\\"\'|\'\"\')    inline_print (ARGS);
+
+<function>(\'\{\'|\'\}\')  do_escaped_brace (ARGS);
+
+extern                  do_extern (ARGS);
+
+\[[^]]*\]               do_array_arguments (ARGS);
+
+\;                	do_semicolon (cfp);
+
+=			do_equals (cfp);
+
+\,                	do_comma (cfp); 
+
+main{c_opt_space}\([^\{]+\{  do_main (ARGS);
+
+static                  do_static (ARGS);
+
+void                    do_void (ARGS);
+
+NO_RETURN               do_NO_RETURN (ARGS);
+
+  /* Parse our print format declaration. */
+
+PRINT_FORMAT      {
+                  check_extensions (cfp);
+                  BEGIN (print_format);
+                  }
+
+<print_format>{c_opt_space} ;
+
+<print_format>\(  pf.index = 0;
+                  
+<print_format>,   pf.index++;
+
+<print_format>\)  do_PRINT_FORMAT (cfp);
+
+<print_format>[1-9][0-9]*  do_print_format_argument (ARGS, & pf);
+
+void{c_opt_space}\*+   do_void_pointer (ARGS);
+
+{c_word}          function_save (ARGS);
+
+\*                function_save (ARGS);
+
+{c_space}         {
+		  count_lines (ARGS);
+		  }
+
+<*>.              {
+                  line_warning ("unknown char `%c' while in %s state", 
+                                yytext[0], state_message ());
+                  }
 
 
 %%
