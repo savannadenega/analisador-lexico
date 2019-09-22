@@ -1,0 +1,112 @@
+notas sobre lex/frex:
+
+The purpose of a lex program is to read an input stream and recognize tokens:
+https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa600/genlex.htm
+
+Characters:
+https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa600/bpxa663.htm
+
+Character classes:
+https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa600/bpxa665.htm
+A sequence of characters enclosed by brackets—[ and ]—forms a character class, which matches a single instance 
+of any character within the brackets. If a circumflex (^) follows the opening bracket, the class matches any characters except those inside the brackets.
+
+
+Putting things togheter:
+https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa600/bpxa666.htm
+
+-  operator * following a regular expression forms a new regular expression, which matches an arbitrary number of (that is, zero or more) adjacent occurrences of the first regular expression. The operation is often referred to as (Kleene) closure. For example, the expression:
+ab*
+matches a followed by zero or more b's; that is a, ab, abb, and so on.
+
+- The operator + is used like * but forms a regular expression that matches one or more adjacent occurrences of a given regular expression. For example:
+ab+
+matches a followed by one or more b's. This is equivalent to abb*.
+
+- A repetition count can follow a regular expression, enclosed in {}. This is analogous to simply writing the same regular expression as many times as indicated. A range of repetitions can be provided, separated by a comma. For example:
+ab{4}
+matches a followed by exactly four b's. That is, abbbb.
+ab{2,4}
+matches a followed by from 2 to 4 b's.
+
+- The operator ? written after a regular expression indicates that the expression is optional: the resulting regular expression matches either the first regular expression, or the empty string. For example:
+[[:lower:]]?
+matches a lowercase letter or nothing (an optional letter).
+
+- The operation of concatenation of two regular expressions is expressed simply by writing the regular expressions adjacent to each other. The resulting regular expression matches any occurrence of the first regular expression followed directly by an occurrence of the second regular expression. For example:
+a*b*
+matches any number of a's followed immediately by any number of b's.
+
+- You can enclose any regular expression in parentheses to cause the priority of operators to be overridden. For example, the expression:
+[[:lower:]]([[:digit:]]│[[:lower:]])*
+
+- Operators lose special meaning when escaped by \ or quoted as in a string "…". The characters also stand for themselves within brackets.
+
+
+lex programs:
+https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa600/bpxa667.htm
+A lex program consists of three sections: a section containing definitions, a section containing translations, and a section containing functions. The style of this layout is similar to that of yacc.
+
+Throughout a lex program, you can freely use newlines and C-style comments; they are treated as white space.
+
+
+Definitions:
+https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa600/bpxa668.htm
+where a name is composed of a letter or underscore, followed by a sequence of letters, underscores, or digits. 
+Within an expression, you can refer to another defined name by enclosing that name in braces, as in {name}
+The %array directive causes yytext to be defined as an array of char; this is also the default. The %pointer directive causes yytext to be defined as a pointer to an array of char.
+
+
+
+yacc:
+https://pt.wikipedia.org/wiki/Yacc
+yacc (acrônimo para Yet Another Compiler Compiler) é um gerador de analisador sintático desenvolvido por Stephen C. Johnson da AT&T para o sistema operacional Unix. Ele gera um analisador sintático, parte do compilador responsável por fornecer sentido sintático a um determinado código fonte, baseado numa gramática formal escrita numa forma similar ao formalismo de Backus-Naur. O resultado é um código para o analisador sintático em C.
+O yacc costumava ser o gerador de analisador sintático padrão na maioria dos sistemas Unix, mas acabou sendo suplantado por versões mais modernas ainda que compatíveis, como Berkeley Yacc, GNU bison, MKS yacc e Abraxas pcyacc. Uma versão atualizada do código original da AT&T é incluída no OpenSolaris. O yacc também já foi reescrito para outras linguagens, incluindo Ratfor, EFL, ML, Ada, Java e Limbo.
+O analisador sintático gerado pelo yacc requer um analisador léxico, que pode ser fornecido externamente através e geradores de analisador léxicos como o lex ou o flex. A norma POSIX define a funcionalidade e os requisitos tanto para lex quanto para yacc.
+
+yacc - Relacionamento com lex: 
+https://pt.wikipedia.org/wiki/Yacc
+O Yacc usa uma gramática formal para analisar sintaticamente uma entrada, algo que o lex não consegue fazer somente com expressões regulares (o lex é limitado a simples máquinas de estado finito). Entretanto, o yacc não consegue ler a partir duma simples entrada de dados, ele requer uma série de tokens, que são geralmente fornecidos pelo lex.
+
+lex:
+https://pt.wikipedia.org/wiki/Lex
+lex é um programa que gera analisadores léxicos.
+A estrutura de um arquivo lex é intencionalmente similar ao de um arquivo yacc.
+definições
+%%
+regras
+%%
+subrotinas
+Na seção de definições são definidas as macros e são importadas as bibliotecas escritas em C.
+É também possível escrever código C na mesma seção. Já a seção de regras associa padrões com instruções C, 
+padrões escritos na forma de expressões regulares. Quando o analisador léxico identifica algum texto da entrada casando com um padrão, 
+ele executa o código C associado. A tentativa do casamento é sempre gananciosa, isto é, no caso de dois padrões distintos casando a mesma entrada, 
+o maior deles será usado. O maior deles é o que consome mais caracteres da entrada. Caso os padrões ambíguos consumam a mesma quantidade de caracteres,
+ o padrão definido antes é escolhido. Por fim, a seção de subrotinas contém blocos de código C que serão apenas copiados ao arquivo final. 
+ Assume-se que tal código será invocado a partir das regras da seção de regras. Em programas maiores, é mais conveniente separar esse código
+ final noutro arquivo.
+ 
+GNU bison:
+https://pt.wikipedia.org/wiki/GNU_bison
+GNU bison é um software livre compilador de compilador escrito para o projeto GNU, e disponível para quase todos os sistemas operacionais. É compatível com o Yacc, e oferece muitas melhorias se comparado com o antigo software. Ele é utilizado em conjunto com analisadores flex (fast lexical analyzer generator). 
+ 
+The lex library routines:
+https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa600/rtine.htm?view=embed
+The lex library contains routines that are either essential or generally useful to lex programs.
+A description of the typedefs, constants, variables, macros, functions, and library routines.
+
+C declarations:
+https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa600/rdecl.htm?view=embed#rdecl
+%{ .. %}
+
+Using yylex():
+https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa600/bpxa673.htm?view=embed
+#include <stdio.h>
+main()
+{
+	return yylex();
+}
+
+
+Error detection and recovery:
+https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa600/bpxa682.htm?view=embed

@@ -10,19 +10,17 @@ Projeto para desenvolvimento de uma aplicação de análise léxica para a disci
 
 ### Como executar
 
-- Primeiro instalar o [Flex](https://codedost.com/flex/)
+- Necesário instalar e configurar os itens no link: [Get Started with FLEX/LEX Programming](https://codedost.com/flex/)
 
-SO Windows
-
-``
-flex.exe ctoy.lex
-``
+- Para executar no `SO Windows`, use os comandos abaixo:
 
 ``
+cd local_do_arquivo
+
+flex ctoy.lex
+
 gcc ctoy.c (ou lex.yy.c) -o ctoy
-``
 
-``
 ctoy.exe            
 ``
 
