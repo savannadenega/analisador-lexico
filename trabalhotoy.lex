@@ -4,10 +4,15 @@
 
 %{
 
+#include <string.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <math.h>
 int numLines = 1;
 
-char colour[30][30] = {};
+char varIds[30][30] = {};
+int actualId = 1;
+bool breakStrcmp = false;
 
 %}
 
@@ -23,8 +28,28 @@ VAR         (\*{SPACE})*{WORD}({SPACE}{ARRAY})*
 
 int|if          { printf("[reserved_word, %s]", yytext); }
 
-{VAR}			{ printf("[id, %s]", yytext); }
+{VAR}			{ 
 
+	int i;
+	for (i = 0; i < sizeof(varIds); i++){
+        if(strcmp(&yytext[0], varIds[i]) == 0){
+			printf("[id, %d]", i);
+			breakStrcmp = true;
+			break;
+		}
+	}
+	if(!breakStrcmp){
+		strcpy(varIds[actualId], &yytext[0]);
+		printf("[id, %d]", actualId);
+		actualId++;
+	}else{
+		breakStrcmp = false;
+	}
+	
+	}
+
+= 			{ printf("[Equal_Op, %s]", yytext); }
+	
 %%
 
 int main(int argc, char *argv[]){
