@@ -110,3 +110,41 @@ main()
 
 Error detection and recovery:
 https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa600/bpxa682.htm?view=embed
+
+
+--------------------------------------
+
+-- Conversoes:
+atoi == convert String to integer
+atof == convert string to double
+
+-- Tipos para imprimir:
+%s ==  char[] | String
+%f == float | real
+%d == int | inteiro
+%c == char | caracter
+
+-- Como usar:
+printf(“Mensagem a ser escrita na tela”, lista de argumentos);
+printf(“Total a pagar: R$ %f”, total);
+
+--------------------------------------
+
+REGEX - NORMAL:
+
+\r: carriage return (\u000D).
+\f: form feed (\u000C).
+\t: horizontal tabulation (\u0009).
+
+comments in a regular expression: (?#...)    
+
+
+--------------------------------------
+
+GERADORES DE ANALISADORES LÉXICOS – LEX / FLEX:
+http://osorio.wait4.org/oldsite/compil/tutoria/exercicios-lex-flex.pdf
+
+LEX regular expressions:
+http://www.csd.uwo.ca/~moreno/CS447/Lectures/Lexical.html/node11.html
+
+REGEX - LEX:
