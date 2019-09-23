@@ -23,7 +23,7 @@ flex ctoy.lex
 ``
 
 ``
-gcc ctoy.c (ou lex.yy.c) -o ctoy  
+gcc lex.yy.c -o ctoy  
 ``
 
 ``
