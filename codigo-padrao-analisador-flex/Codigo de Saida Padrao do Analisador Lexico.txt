@@ -1,0 +1,341 @@
+
+C:\Users\Savanna\Desktop\Projetos Git\analisador-lexico>trabalho.exe
+----- Linha: 1
+#include <stdio.h>
+[reserved_word, #include]  [external_library, <stdio.h>]
+
+------- Linha: 2
+#include <conio.h>
+[reserved_word, #include]  [external_library, <conio.h>]
+
+------- Linha: 3
+
+
+
+------- Linha: 4
+void CalculoMedia()
+[reserved_word, void]  [id, 1] [l_paren, (] [r_paren, )]
+
+------- Linha: 5
+{
+[l_bracket, {]
+
+------- Linha: 6
+    float NotaDaP1, NotaDaP2;
+    [reserved_word, float]  [id, 2] [comma, ,]  [id, 3] [semicolon, ;]
+
+------- Linha: 7
+    float Media;
+    [reserved_word, float]  [id, 4] [semicolon, ;]
+
+------- Linha: 8
+
+
+
+------- Linha: 9
+    clrscr(); // Limpa a tela
+    [id, 5] [l_paren, (] [r_paren, )] [semicolon, ;]
+
+------- Linha: 10
+    NotaDaP1 = 6.6;  // Atribuição do Valores das médias
+    [id, 2]  [equal_op, =]  [num, 6.6] [semicolon, ;]
+
+------- Linha: 11
+    NotaDaP2 = 8.2;
+    [id, 3]  [equal_op, =]  [num, 8.2] [semicolon, ;]
+
+------- Linha: 12
+
+
+
+------- Linha: 13
+    Media = (NotaDaP1 + NotaDaP2) / 2.0;
+    [id, 4]  [equal_op, =]  [l_paren, (] [id, 2]  [arith_op, +]  [id, 3] [r_paren, )]  [arith_op, /]  [num, 2.0] [semicolon, ;]
+
+------- Linha: 14
+
+
+
+------- Linha: 15
+    printf("Média Final : %6.3f", Media);
+    [reserved_word, printf] [l_paren, (] [string_literal, "Média Final : %6.3f"] [comma, ,]  [id, 4] [r_paren, )] [semicolon, ;]
+
+------- Linha: 16
+    /* No momento da execução sinal %6.3f vai ser substituído
+        pelo valor da variável Media
+    Média Final:  7.400 */
+
+
+------- Linha: 17
+    getch(); // Espera que o usuário pressione uma tecla
+    [id, 6] [l_paren, (] [r_paren, )] [semicolon, ;]
+
+------- Linha: 18
+}
+[r_bracket, }]
+
+------- Linha: 19
+
+
+
+------- Linha: 20
+int VerificaNumero()
+[reserved_word, int]  [id, 7] [l_paren, (] [r_paren, )]
+
+------- Linha: 21
+{
+[l_bracket, {]
+
+------- Linha: 22
+    int num;
+    [reserved_word, int]  [id, 8] [semicolon, ;]
+
+------- Linha: 23
+    string s;
+    [reserved_word, string]  [id, 9] [semicolon, ;]
+
+------- Linha: 24
+
+
+
+------- Linha: 25
+    printf ("Digite um número: ");
+    [reserved_word, printf]  [l_paren, (] [string_literal, "Digite um número: "] [r_paren, )] [semicolon, ;]
+
+------- Linha: 26
+    scanf ("%d",&num);
+    [reserved_word, scanf]  [l_paren, (] [string_literal, "%d"] [comma, ,] [id, 10] [r_paren, )] [semicolon, ;]
+
+------- Linha: 27
+
+
+
+------- Linha: 28
+    if (num>10)
+    [reserved_word, if]  [l_paren, (] [id, 8] [relational_op, >] [num, 10] [r_paren, )]
+
+------- Linha: 29
+    {
+    [l_bracket, {]
+
+------- Linha: 30
+        printf ("\n\n O número é maior que 10");
+        [reserved_word, printf]  [l_paren, (] [string_literal, "\n\n O número é maior que 10"] [r_paren, )] [semicolon, ;]
+
+------- Linha: 31
+        s = "errou";
+        [id, 9]  [equal_op, =]  [string_literal, "errou"] [semicolon, ;]
+
+------- Linha: 32
+    }
+    [r_bracket, }]
+
+------- Linha: 33
+    if (num==10)
+    [reserved_word, if]  [l_paren, (] [id, 8] [relational_op, ==] [num, 10] [r_paren, )]
+
+------- Linha: 34
+    {
+    [l_bracket, {]
+
+------- Linha: 35
+        printf ("\n\n Você acertou!\n");
+        [reserved_word, printf]  [l_paren, (] [string_literal, "\n\n Você acertou!\n"] [r_paren, )] [semicolon, ;]
+
+------- Linha: 36
+        printf ("O numero é igual a 10.");
+        [reserved_word, printf]  [l_paren, (] [string_literal, "O numero é igual a 10."] [r_paren, )] [semicolon, ;]
+
+------- Linha: 37
+        s = "acertou";
+        [id, 9]  [equal_op, =]  [string_literal, "acertou"] [semicolon, ;]
+
+------- Linha: 38
+    }
+    [r_bracket, }]
+
+------- Linha: 39
+    if (num<10)
+    [reserved_word, if]  [l_paren, (] [id, 8] [relational_op, <] [num, 10] [r_paren, )]
+
+------- Linha: 40
+    {
+    [l_bracket, {]
+
+------- Linha: 41
+        printf ("\n\n O número é menor que 10");
+        [reserved_word, printf]  [l_paren, (] [string_literal, "\n\n O número é menor que 10"] [r_paren, )] [semicolon, ;]
+
+------- Linha: 42
+        s = "errou";
+        [id, 9]  [equal_op, =]  [string_literal, "errou"] [semicolon, ;]
+
+------- Linha: 43
+    }
+    [r_bracket, }]
+
+------- Linha: 44
+    if(num == 10 && s == "acertou")
+    [reserved_word, if] [l_paren, (] [id, 8]  [relational_op, ==]  [num, 10]  [logical_op, &&]  [id, 9]  [relational_op, ==]  [string_literal, "acertou"] [r_paren, )]
+
+------- Linha: 45
+    {
+    [l_bracket, {]
+
+------- Linha: 46
+        return 1;
+        [reserved_word, return]  [num, 1] [semicolon, ;]
+
+------- Linha: 47
+    }
+    [r_bracket, }]
+
+------- Linha: 48
+    return 0;
+    [reserved_word, return]  [num, 0] [semicolon, ;]
+
+------- Linha: 49
+}
+[r_bracket, }]
+
+------- Linha: 50
+void AlterarVetor(int * vetor, int elementos)
+[reserved_word, void]  [id, 11] [l_paren, (] [reserved_word, int]  [id, 12] [comma, ,]  [reserved_word, int]  [id, 13] [r_paren, )]
+
+------- Linha: 51
+{
+[l_bracket, {]
+
+------- Linha: 52
+    int i;
+    [reserved_word, int]  [id, 14] [semicolon, ;]
+
+------- Linha: 53
+
+
+
+------- Linha: 54
+    if(vetor != NULL)
+    [reserved_word, if] [l_paren, (] [id, 15]  [relational_op, !=]  [reserved_word, NULL] [r_paren, )]
+
+------- Linha: 55
+    {
+    [l_bracket, {]
+
+------- Linha: 56
+        for(i = 0; i < elementos; i++)
+        [reserved_word, for] [l_paren, (] [id, 14]  [equal_op, =]  [num, 0] [semicolon, ;]  [id, 14]  [relational_op, <]  [id, 13] [semicolon, ;]  [id, 14] [arith_op, ++] [r_paren, )]
+
+------- Linha: 57
+        {
+        [l_bracket, {]
+
+------- Linha: 58
+            *(vetor) = *(vetor) * 2; //Ex: V[i] = V[i] * 2
+            [id, 16]  [equal_op, =]  [id, 16]  [arith_op, *]  [num, 2] [semicolon, ;]
+
+------- Linha: 59
+            vetor++; //Desloca o ponteiro para o próximo elemento
+            [id, 15] [arith_op, ++] [semicolon, ;]
+
+------- Linha: 60
+        }
+        [r_bracket, }]
+
+------- Linha: 61
+    }
+    [r_bracket, }]
+
+------- Linha: 62
+}
+[r_bracket, }]
+
+------- Linha: 63
+
+
+
+------- Linha: 64
+int main()
+[reserved_word, int]  [id, 17] [l_paren, (] [r_paren, )]
+
+------- Linha: 65
+{
+[l_bracket, {]
+
+------- Linha: 66
+    int v[] = {5, 10, 15, 3, 10, 76, 5, 13, 33, 45};
+    [reserved_word, int]  [id, 18]  [equal_op, =]  [l_bracket, {] [num, 5] [comma, ,]  [num, 10] [comma, ,]  [num, 15] [comma, ,]  [num, 3] [comma, ,]  [num, 10] [comma, ,]  [num, 76] [comma, ,]  [num, 5] [comma, ,]  [num, 13] [comma, ,]  [num, 33] [comma, ,]  [num, 45] [r_bracket, }] [semicolon, ;]
+
+------- Linha: 67
+    int * pt;
+    [reserved_word, int]  [id, 19] [semicolon, ;]
+
+------- Linha: 68
+    int i;
+    [reserved_word, int]  [id, 14] [semicolon, ;]
+
+------- Linha: 69
+
+
+
+------- Linha: 70
+    pt = v; //Atribui o endereço do vetor
+    [id, 20]  [equal_op, =]  [id, 21] [semicolon, ;]
+
+------- Linha: 71
+
+
+
+------- Linha: 72
+    AlterarVetor(v, 10);
+    [id, 11] [l_paren, (] [id, 21] [comma, ,]  [num, 10] [r_paren, )] [semicolon, ;]
+
+------- Linha: 73
+
+
+
+------- Linha: 74
+    for(int i = 0; i < 10; i++)
+    [reserved_word, for] [l_paren, (] [reserved_word, int]  [id, 14]  [equal_op, =]  [num, 0] [semicolon, ;]  [id, 14]  [relational_op, <]  [num, 10] [semicolon, ;]  [id, 14] [arith_op, ++] [r_paren, )]
+
+------- Linha: 75
+    {
+    [l_bracket, {]
+
+------- Linha: 76
+        printf("V[%i] = %i\r\n", i, *(pt + i));
+        [reserved_word, printf] [l_paren, (] [string_literal, "V[%i] = %i\r\n"] [comma, ,]  [id, 14] [comma, ,]  [arith_op, *] [l_paren, (] [id, 20]  [arith_op, +]  [id, 14] [r_paren, )] [r_paren, )] [semicolon, ;]
+
+------- Linha: 77
+    }
+    [r_bracket, }]
+
+------- Linha: 78
+
+
+
+------- Linha: 79
+    CalculoMedia();
+    [id, 1] [l_paren, (] [r_paren, )] [semicolon, ;]
+
+------- Linha: 80
+    VerificaNumero();
+    [id, 7] [l_paren, (] [r_paren, )] [semicolon, ;]
+
+------- Linha: 81
+
+
+
+------- Linha: 82
+    return 0;
+    [reserved_word, return]  [num, 0] [semicolon, ;]
+
+------- Linha: 83
+}
+[r_bracket, }]
+
+------- Linha: 84
+
+
+
+------- Linha: 85

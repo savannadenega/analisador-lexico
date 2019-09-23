@@ -1,210 +1,117 @@
-/* Scanner para uma linguagem C simplificada */
+/* Scanner para uma linguagem Pascal simplificada */
 
 %option noyywrap
 
 %{
-	
+
 #include <string.h>
+#include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
-int numlines = 0;
+int numLines = 1;
 
-/* Defining this macro stops a compiler warning about an unused
-   function called "input" or "yyinput". */
-
-#define YY_NO_INPUT
+char varIds[30][30] = {};
+int actualId = 1;
+bool breakStrcmp = false;
 
 %}
 
-/*
-- include de biblioteca
-- declaracao de metodo (com ou sem parametro)
-- declaracao variavel (tipos: float)
-- declaracao variavel com ponteiro
-- atribuicao de variavel
-- uso de variavel (com ponteiro e parenteses ou nao)
-- array de variavel
-- operadores aritmeticos (variavel ++)
-- chamada de metodo (com ou sem parametro)
-- declaracao operador condicional (if{})
-- declaracao operador iteracao (for)
-- retorno
-- comentarios
-- declaracao de array
-*/
+ENDLINE     \r?\n
+WORD        [A-Za-z_][A-Za-z_0-9]*
+SPACE   	[ \t\f\r\n]*
+ARRAY       \[[^\][]*\]
+VAR         (\*{SPACE})*{WORD}({SPACE}{ARRAY})*
+VAR_POINTER (\&){WORD}*
+VAR_POINTER_PARENT \*{SPACE}\(([A-Za-z_0-9])+\)
+VAR_NO_POINTER         {WORD}({SPACE}{ARRAY})*
+DIGIT		[0-9]
+STRING 		\"([^\\\"]|\\.)*\"
 
-/* Macros for C preprocessor. */
-
-ENDLINE       \r?\n
-
-/* The `\\{ENDLINE}' is to deal with multiline CPP statements. */
-
-CPP_SPACE     ([ \t\f\r]|\\{ENDLINE})+
-CPP_OPT_SPACE ([ \t\f\r]|\\{ENDLINE})*
-
-CPP_ANY       (.|\\{ENDLINE})
-CPP           ^{CPP_OPT_SPACE}#{CPP_OPT_SPACE}
-
-/* The macro C_SPACE has been set to match only a single `\n' in order
-   to prevent collisions with {CPP}.  I don't know if there is
-   anywhere in the rules that expects {C_SPACE} to match more than one
-   `\n' - this might be a problem. */
-
-C_SPACE       ([ \t\f\r]+|\n)
-C_OPT_SPACE   [ \t\f\r\n]*
-C_WORD        [A-Za-z_][A-Za-z_0-9]*
-C_ARRAY       \[[^\][]*\]
-C_VAR         (\*{C_OPT_SPACE})*{C_WORD}({C_OPT_SPACE}{C_ARRAY})*
-C_VAR_NO_POINTER         {C_WORD}({C_OPT_SPACE}{C_ARRAY})*
-C_FUNC_PTR    \({C_OPT_SPACE}\**{C_OPT_SPACE}{C_WORD}{C_OPT_SPACE}\)
-BRACES \{[^{}]*\}
-LINE_DIRECTIVE line{CPP_OPT_SPACE}[0-9]+{CPP_OPT_SPACE}\"([^\"]|\\\")+\"
+LIB_STDIO	<stdio.h>
+LIB_CONIO	<conio.h>
+EQUAL 		=
+LOGICAL 	"||"|"&&"
+RELATIONAL	"!="|"<"|"<="|"=="|">="|">"
+ARITMETIC   "++"|"+"|"-"|"*"|"/"
+COMMA		","
+SEMICOLON	";"
+L_BRACKET   "{"
+R_BRACKET   "}"
+L_PAREN		"("
+R_PAREN		")"
+COMMENT		"//"[^\n]*
 
 %%
 
-
-{ENDLINE}					 numlines++;
-
-
-{CPP}if{CPP_ANY}*$             { printf("[reserved_word, %s]\n", yytext); }
-
-{CPP}else{CPP_ANY}*$           { printf("[reserved_word, %s]\n", yytext); }
-
-{CPP}elif{CPP_ANY}*$           { printf("[reserved_word, %s]\n", yytext); }
-
-{CPP}endif{CPP_ANY}*$          { printf("[reserved_word, %s]\n", yytext); }
-
-
-
-
-
-
-
-
-
-
-
-
-"/"(\\{ENDLINE})?"*"  {
-                    if (YY_START != c_string) {
-                      { printf("​[String, %s]\n ", yytext); }
-                    }
-                    else {
-                      {}
-                    } 
-                  }
-
-\*+\/  {}
-
-(([^\*]|\n)*|\*+([^/\*]|\n))   {}
-
-"/"(\\{ENDLINE})?"/".*    {}
-
-typedef(\{(\{(\{({BRACES}|[^}{])*\}|{BRACES}|[^}{])*\}|{BRACES}|[^}{])*\}|{BRACES}|[^}{;])*; {} 
-
-
-
-
-
-
-\,     			{ printf("​[comma, %s]\n ", yytext); }		 
-
-\{   			{ printf("​[l_bracket, %s]\n ", yytext); }
-
-\([^\)]*\) 		{}
-
-([^\"]|\n)  	{}
-
-\({C_OPT_SPACE}{C_OPT_SPACE}\)        {}
-\({C_OPT_SPACE}void{C_OPT_SPACE}\)    { printf("[reserved_word, %s]\n", yytext); }
-
-
-
-
-
-
-
-\({C_OPT_SPACE}\*{C_OPT_SPACE}     { printf("[function, %s]\n", yytext); }
-
-\){C_OPT_SPACE}\(        		   { printf("[function, %s]\n", yytext); }
-
-\)      						   { printf("[function, %s]\n", yytext); }
-
-{C_WORD}   						   { printf("[function, %s]\n", yytext); }
-
-[^\)]+     						   { printf("[function, %s]\n", yytext); }
-
-\)  							   { printf("[function, %s]\n", yytext); }
-
-\(   							   { printf("[function, %s]\n", yytext); }
-
-[^\(\)]+  						   { printf("[function, %s]\n", yytext); }
-
-
-
-
-
-
-
-\(                { printf("[argument_function, %s]\n", yytext); }
-
-\)     			  { printf("[argument_function, %s]\n", yytext); }
-
-\(   			  { printf("[argument_function, %s]\n", yytext); }
-
-({C_VAR}|\*+)	  { printf("[argument_function, %s]\n", yytext); }
-
-\,      		  { printf("[argument_function, %s]\n", yytext); }
-
-{C_SPACE}     	  { printf("[argument_function, %s]\n", yytext); }
-
-"..."  			  { printf("[argument_function, %s]\n", yytext); }
-
-\{                        { printf("​[l_bracket, %s]\n ", yytext); }
-
-
-
-
-
-
-\}                        { printf("​[r_bracket, %s]\n ", yytext); }
-
-(\\[^\"])*            			  { printf("​[String, %s]\n ", yytext); }
-
-(\\.|[^\\"])*         			  { printf("​[String, %s]\n ", yytext); }
-
-([^\}\{\"]|\n|\'\\\"\'|\'\"\')    { printf("​[String, %s]\n ", yytext); }
-
-\[[^]]*\]               		  { printf("​[array, %s]\n ", yytext); }
-
-\;                	{ printf("​[semicolon, %s]\n ", yytext); }
-
-=					{ printf("​[E​qual_Op, %s]\n ", yytext); }
-
-\,                	{ printf("[argument_function, %s]\n", yytext); } 
-
-main{C_OPT_SPACE}\([^\{]+\{  { printf("[reserved_word, %s]\n", yytext); }
-
-static                  	 { printf("[reserved_word, %s]\n", yytext); }
-
-void                    	 { printf("[reserved_word, %s]\n", yytext); }
-
-
-
-
-void{C_OPT_SPACE}\*+   { printf("[reserved_word, %s]\n", yytext); }
+	/* Ignore spaces and endline. */
+
+{ENDLINE} 	numLines++;{ printf("\n\n------- Linha: %d\n", numLines); }
+
+	/* Reserved words. */
+
+#include|scanf|printf|do|while|for|if|else|switch|case|void|return|NULL|null|int|float|double|String|string|bool|break    { printf("[reserved_word, %s] ", yytext); }
+{LIB_STDIO}|{LIB_CONIO}			{ printf("[external_library, %s] ", yytext); }
+
+	/* Functions. */
+
+{R_BRACKET}		{ printf("[r_bracket, %s] ", yytext); }
+{L_BRACKET}		{ printf("[l_bracket, %s] ", yytext); }
+{L_PAREN}		{ printf("[l_paren, %s] ", yytext); }
+{R_PAREN}		{ printf("[r_paren, %s] ", yytext); }
+{COMMA}			{ printf("[comma, %s] ", yytext); }
+{SEMICOLON}		{ printf("[semicolon, %s] ", yytext); }
+
+ /* Comments. */
+
+{COMMENT}						{}
+"/*"([^*]|\*+[^*/])*\*+"/"		{}
+
+	/* Numbers. */
+	
+{DIGIT}+ { printf("[num, %s] ", yytext);}
+{DIGIT}+"."{DIGIT}+ {printf("[num, %s] ", yytext);}
+
+	/* Conditional statements. */
+	
+{EQUAL} 		{ printf("[equal_op, %s] ", yytext); }
+{LOGICAL}		{ printf("[logical_op, %s] ", yytext); }
+{RELATIONAL}	{ printf("[relational_op, %s] ", yytext); }
+{ARITMETIC}	    { printf("[arith_op, %s] ", yytext); }
+
+	/* String. */
+	
+{STRING}	  { printf("[string_literal, %s] ", yytext); }
+
+	/* Variables. */
+
+{VAR}|{VAR_NO_POINTER}|{VAR_POINTER}|{VAR_POINTER_PARENT}			{ 
+
+	int i;
+	for (i = 0; i < sizeof(varIds); i++){
+        if(strcmp(&yytext[0], varIds[i]) == 0){
+			printf("[id, %d] ", i);
+			breakStrcmp = true;
+			break;
+		}
+	}
+	if(!breakStrcmp){
+		strcpy(varIds[actualId], &yytext[0]);
+		printf("[id, %d] ", actualId);
+		actualId++;
+	}else{
+		breakStrcmp = false;
+	}
+	
+	}
 
 
 
 %%
 
 int main(int argc, char *argv[]){
+	printf("----- Linha: 1\n", yytext);
 	yyin = fopen(argv[1], "r");
 	yylex();
 	fclose(yyin);
 	return 0;
 }
-
-
-

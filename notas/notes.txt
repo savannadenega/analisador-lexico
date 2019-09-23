@@ -148,3 +148,9 @@ LEX regular expressions:
 http://www.csd.uwo.ca/~moreno/CS447/Lectures/Lexical.html/node11.html
 
 REGEX - LEX:
+
+(([^\*]|\n)*|\*+([^/\*]|\n))  {}
+\*+\/						  {}
+.							  {}
+
+
